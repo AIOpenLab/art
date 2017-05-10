@@ -13,6 +13,12 @@ l1_norm = partial(np.linalg.norm, ord=1, axis=-1)
 
 class FuzzyART(object):
     def __init__(self, alpha=1.0, gamma=0.01, rho=0.5, complement_coding=True):
+        """        
+        :param alpha: learning rate [0,1] 
+        :param gamma: regularization term >0
+        :param rho: vigilance [0,1]
+        :param complement_coding: use complement coding scheme for inputs
+        """
         self.alpha = alpha  # learning rate
         self.beta = 1 - alpha
         self.gamma = gamma  # choice parameter
@@ -44,6 +50,13 @@ class FuzzyART(object):
             return np.argmax(scores * threshold.astype(int))
 
     def train(self, x, epochs=1):
+        """        
+        :param x: 2d array of size (samples, features), where all features are
+         in [0, 1]
+        :param epochs: number of training epochs, the training samples are 
+        shuffled after each epoch  
+        :return: self
+        """
         samples = self._complement_code(np.atleast_2d(x))
 
         if self.w is None:
@@ -61,12 +74,18 @@ class FuzzyART(object):
         return self
 
     def test(self, x):
+        """        
+        :param x: 2d array of size (samples, features), where all features are
+         in [0, 1] 
+        :return: category IDs for each provided sample
+        """
         samples = self._complement_code(np.atleast_2d(x))
 
         categories = np.zeros(len(samples))
         for i, sample in enumerate(samples):
             categories[i] = self._match_category(sample)
         return categories
+
 
 if __name__ == '__main__':
     import sklearn.datasets as ds
